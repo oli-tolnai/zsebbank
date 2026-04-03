@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAccountStore } from '@/stores/accountStore';
 import { useTransactionStore } from '@/stores/transactionStore';
@@ -13,7 +13,7 @@ import { DynamicIcon } from '@/components/common/DynamicIcon';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Strings } from '@/constants/strings';
 import { formatHuf, getCurrentMonth } from '@/utils/format';
-import { getDaysUntil } from '@/utils/date';
+import { getDaysUntil, isWithinDays } from '@/utils/date';
 import { Wallet, TrendingUp, TrendingDown, ChevronRight, LayoutDashboard } from 'lucide-react';
 import { db } from '@/db/database';
 import type { MonthlyStats } from '@/types';
@@ -25,7 +25,8 @@ export function DashboardPage() {
   const cashBalance = useAccountStore((s) => s.cashBalance);
   const bankBalance = useAccountStore((s) => s.bankBalance);
   const transactions = useTransactionStore((s) => s.transactions);
-  const upcoming = useRecurringStore((s) => s.getUpcoming(7));
+  const templates = useRecurringStore((s) => s.templates);
+  const upcoming = useMemo(() => templates.filter((t) => t.isActive && isWithinDays(t.nextDueDate, 7)), [templates]);
   const piggyBanks = usePiggyStore((s) => s.piggyBanks);
   const [monthStats, setMonthStats] = useState<MonthlyStats>({ month: '', income: 0, expense: 0 });
 

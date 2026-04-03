@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useLabelStore } from '@/stores/labelStore';
 import type { LabelType } from '@/types';
 import { DynamicIcon } from './DynamicIcon';
@@ -10,7 +11,11 @@ interface LabelPickerProps {
 }
 
 export function LabelPicker({ selectedIds, onChange, filterType = 'all' }: LabelPickerProps) {
-  const labels = useLabelStore((s) => s.getByType(filterType === 'all' ? 'all' : filterType));
+  const allLabels = useLabelStore((s) => s.labels);
+  const labels = useMemo(() => {
+    if (filterType === 'all') return allLabels;
+    return allLabels.filter((l) => l.type === filterType || l.type === 'both');
+  }, [allLabels, filterType]);
 
   const toggleLabel = (id: string) => {
     if (selectedIds.includes(id)) {
