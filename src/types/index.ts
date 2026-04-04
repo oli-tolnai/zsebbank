@@ -4,6 +4,8 @@ export type TransactionType = 'income' | 'expense' | 'transfer';
 export type LabelType = 'expense' | 'income' | 'both';
 export type Frequency = 'monthly' | 'bimonthly' | 'quarterly' | 'yearly';
 export type SavingsTransactionType = 'deposit' | 'withdraw';
+export type DebtDirection = 'they_owe_me' | 'i_owe_them';
+export type DebtStatus = 'pending' | 'settled';
 
 // All monetary amounts are integers in HUF (forints)
 
@@ -78,6 +80,21 @@ export interface PiggyTransaction {
   createdAt: string;
 }
 
+export interface Debt {
+  id: string;
+  direction: DebtDirection;
+  personName: string;
+  amount: number;
+  name: string;
+  description: string | null;
+  labelIds: string[];
+  status: DebtStatus;
+  settledAccountId: string | null;
+  settledAt: string | null;
+  date: string;
+  createdAt: string;
+}
+
 export interface Setting {
   key: string;
   value: string;
@@ -120,6 +137,7 @@ export interface ZsebbankBackup {
     recurringTransactions: RecurringTransaction[];
     piggyBanks: PiggyBank[];
     piggyTransactions: PiggyTransaction[];
+    debts: Debt[];
     settings: Setting[];
   };
 }

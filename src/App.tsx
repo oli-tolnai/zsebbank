@@ -6,6 +6,7 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { useLabelStore } from '@/stores/labelStore';
 import { useRecurringStore } from '@/stores/recurringStore';
 import { usePiggyStore } from '@/stores/piggyStore';
+import { useDebtStore } from '@/stores/debtStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { seedDefaults } from '@/db/seed';
 import { PinLockScreen } from '@/components/ui/PinLockScreen';
@@ -32,6 +33,7 @@ export default function App() {
       await useTransactionStore.getState().load();
       await useRecurringStore.getState().load();
       await usePiggyStore.getState().load();
+      await useDebtStore.getState().load();
 
       // Execute due recurring transactions
       try {

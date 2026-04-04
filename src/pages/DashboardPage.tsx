@@ -4,6 +4,7 @@ import { useAccountStore } from '@/stores/accountStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 import { useRecurringStore } from '@/stores/recurringStore';
 import { usePiggyStore } from '@/stores/piggyStore';
+import { useDebtStore } from '@/stores/debtStore';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { TransactionRow } from '@/components/common/TransactionRow';
@@ -14,7 +15,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { Strings } from '@/constants/strings';
 import { formatHuf, getCurrentMonth } from '@/utils/format';
 import { getDaysUntil, isWithinDays } from '@/utils/date';
-import { Wallet, TrendingUp, TrendingDown, ChevronRight, LayoutDashboard } from 'lucide-react';
+import { Wallet, TrendingUp, TrendingDown, ChevronRight, LayoutDashboard, ArrowDownLeft, ArrowUpRight } from 'lucide-react';
 import { db } from '@/db/database';
 import type { MonthlyStats } from '@/types';
 
@@ -28,6 +29,10 @@ export function DashboardPage() {
   const templates = useRecurringStore((s) => s.templates);
   const upcoming = useMemo(() => templates.filter((t) => t.isActive && isWithinDays(t.nextDueDate, 7)), [templates]);
   const piggyBanks = usePiggyStore((s) => s.piggyBanks);
+  const pendingDebts = useDebtStore((s) => s.debts);
+  const pendingDebtsList = useMemo(() => pendingDebts.filter((d) => d.status === 'pending'), [pendingDebts]);
+  const totalOwedToMe = useDebtStore((s) => s.totalOwedToMe);
+  const totalIOwe = useDebtStore((s) => s.totalIOwe);
   const [monthStats, setMonthStats] = useState<MonthlyStats>({ month: '', income: 0, expense: 0 });
 
   useEffect(() => {
@@ -157,6 +162,41 @@ export function DashboardPage() {
             </div>
           )}
         </Card>
+
+        {/* Debts Summary */}
+        {pendingDebtsList.length > 0 && (
+          <Card>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-semibold text-slate-900">{Strings.debt.title}</h3>
+              <button onClick={() => navigate('/debts')} className="text-primary text-sm font-medium">{Strings.dashboard.showAll}</button>
+            </div>
+            <div className="grid grid-cols-2 gap-2 mb-3">
+              <div className="bg-income-light/50 rounded-xl p-2.5 text-center">
+                <ArrowDownLeft size={14} className="text-income mx-auto mb-0.5" />
+                <p className="text-[10px] text-slate-500">{Strings.debt.totalOwedToMe}</p>
+                <p className="text-sm font-semibold text-income tabular-nums">{formatHuf(totalOwedToMe())}</p>
+              </div>
+              <div className="bg-expense-light/50 rounded-xl p-2.5 text-center">
+                <ArrowUpRight size={14} className="text-expense mx-auto mb-0.5" />
+                <p className="text-[10px] text-slate-500">{Strings.debt.totalIOwe}</p>
+                <p className="text-sm font-semibold text-expense tabular-nums">{formatHuf(totalIOwe())}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              {pendingDebtsList.slice(0, 3).map((debt) => (
+                <button key={debt.id} onClick={() => navigate(`/debts/${debt.id}`)} className="w-full flex items-center justify-between text-left">
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{debt.personName}</p>
+                    <p className="text-xs text-slate-500 truncate">{debt.name}</p>
+                  </div>
+                  <p className={`text-sm font-semibold tabular-nums shrink-0 ml-2 ${debt.direction === 'they_owe_me' ? 'text-income' : 'text-expense'}`}>
+                    {debt.direction === 'they_owe_me' ? '+' : '-'}{formatHuf(debt.amount)}
+                  </p>
+                </button>
+              ))}
+            </div>
+          </Card>
+        )}
 
         {/* Piggy Banks Summary */}
         {piggyBanks.length > 0 && (

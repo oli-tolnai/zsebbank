@@ -6,6 +6,7 @@ import type {
   RecurringTransaction,
   PiggyBank,
   PiggyTransaction,
+  Debt,
   Setting,
 } from '@/types';
 
@@ -16,6 +17,7 @@ export class ZsebbankDB extends Dexie {
   recurringTransactions!: EntityTable<RecurringTransaction, 'id'>;
   piggyBanks!: EntityTable<PiggyBank, 'id'>;
   piggyTransactions!: EntityTable<PiggyTransaction, 'id'>;
+  debts!: EntityTable<Debt, 'id'>;
   settings!: EntityTable<Setting, 'key'>;
 
   constructor() {
@@ -29,6 +31,10 @@ export class ZsebbankDB extends Dexie {
       piggyBanks: 'id, linkedAccountId',
       piggyTransactions: 'id, piggyBankId, accountId, date',
       settings: 'key',
+    });
+
+    this.version(2).stores({
+      debts: 'id, direction, status, personName, date',
     });
   }
 }

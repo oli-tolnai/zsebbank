@@ -12,6 +12,7 @@ import { useTransactionStore } from '@/stores/transactionStore';
 import { useLabelStore } from '@/stores/labelStore';
 import { useRecurringStore } from '@/stores/recurringStore';
 import { usePiggyStore } from '@/stores/piggyStore';
+import { useDebtStore } from '@/stores/debtStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { Download, Upload } from 'lucide-react';
 import type { ZsebbankBackup } from '@/types';
@@ -27,6 +28,7 @@ export function ExportImportPage() {
     await useLabelStore.getState().load();
     await useRecurringStore.getState().load();
     await usePiggyStore.getState().load();
+    await useDebtStore.getState().load();
     await useSettingsStore.getState().load();
   };
 

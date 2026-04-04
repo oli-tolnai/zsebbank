@@ -18,6 +18,9 @@ import { PinSettingsPage } from '@/pages/PinSettingsPage';
 import { LabelsPage } from '@/pages/LabelsPage';
 import { ExportImportPage } from '@/pages/ExportImportPage';
 import { MorePage } from '@/pages/MorePage';
+import { DebtsPage } from '@/pages/DebtsPage';
+import { DebtFormPage } from '@/pages/DebtFormPage';
+import { DebtDetailPage } from '@/pages/DebtDetailPage';
 
 export const router = createBrowserRouter([
   {
@@ -41,6 +44,10 @@ export const router = createBrowserRouter([
       { path: 'piggy/new', element: <PiggyFormPage /> },
       { path: 'piggy/:id', element: <PiggyDetailPage /> },
       { path: 'piggy/:id/edit', element: <PiggyFormPage /> },
+      { path: 'debts', element: <DebtsPage /> },
+      { path: 'debts/new', element: <DebtFormPage /> },
+      { path: 'debts/:id', element: <DebtDetailPage /> },
+      { path: 'debts/:id/edit', element: <DebtFormPage /> },
       { path: 'statistics', element: <StatisticsPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'settings/pin', element: <PinSettingsPage /> },

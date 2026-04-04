@@ -2,11 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { Strings } from '@/constants/strings';
-import { History, RefreshCw, BarChart3, Settings, ChevronRight } from 'lucide-react';
+import { History, RefreshCw, BarChart3, Settings, HandCoins, ChevronRight } from 'lucide-react';
 
 const menuItems = [
   { icon: History, label: Strings.transaction.history, path: '/history' },
   { icon: RefreshCw, label: Strings.recurring.title, path: '/recurring' },
+  { icon: HandCoins, label: Strings.debt.title, path: '/debts' },
   { icon: BarChart3, label: Strings.statistics.title, path: '/statistics' },
   { icon: Settings, label: Strings.settings.title, path: '/settings' },
 ];

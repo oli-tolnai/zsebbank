@@ -2,7 +2,7 @@ import { db } from '@/db/database';
 import type { ZsebbankBackup } from '@/types';
 
 export async function exportBackup(): Promise<ZsebbankBackup> {
-  const [accounts, labels, transactions, recurringTransactions, piggyBanks, piggyTransactions, settings] =
+  const [accounts, labels, transactions, recurringTransactions, piggyBanks, piggyTransactions, debts, settings] =
     await Promise.all([
       db.accounts.toArray(),
       db.labels.toArray(),
@@ -10,6 +10,7 @@ export async function exportBackup(): Promise<ZsebbankBackup> {
       db.recurringTransactions.toArray(),
       db.piggyBanks.toArray(),
       db.piggyTransactions.toArray(),
+      db.debts.toArray(),
       db.settings.toArray(),
     ]);
 
@@ -25,6 +26,7 @@ export async function exportBackup(): Promise<ZsebbankBackup> {
         recurringTransactions: recurringTransactions.length,
         piggyBanks: piggyBanks.length,
         piggyTransactions: piggyTransactions.length,
+        debts: debts.length,
         settings: settings.length,
       },
     },
@@ -35,6 +37,7 @@ export async function exportBackup(): Promise<ZsebbankBackup> {
       recurringTransactions,
       piggyBanks,
       piggyTransactions,
+      debts,
       settings,
     },
   };
@@ -50,9 +53,10 @@ export async function importBackup(backup: ZsebbankBackup): Promise<void> {
 
   await db.transaction(
     'rw',
-    [db.accounts, db.labels, db.transactions, db.recurringTransactions, db.piggyBanks, db.piggyTransactions, db.settings],
+    [db.accounts, db.labels, db.transactions, db.recurringTransactions, db.piggyBanks, db.piggyTransactions, db.debts, db.settings],
     async () => {
       // Clear all tables
+      await db.debts.clear();
       await db.piggyTransactions.clear();
       await db.piggyBanks.clear();
       await db.transactions.clear();
@@ -68,6 +72,7 @@ export async function importBackup(backup: ZsebbankBackup): Promise<void> {
       if (backup.data.recurringTransactions?.length) await db.recurringTransactions.bulkAdd(backup.data.recurringTransactions);
       if (backup.data.piggyBanks?.length) await db.piggyBanks.bulkAdd(backup.data.piggyBanks);
       if (backup.data.piggyTransactions?.length) await db.piggyTransactions.bulkAdd(backup.data.piggyTransactions);
+      if (backup.data.debts?.length) await db.debts.bulkAdd(backup.data.debts);
       if (backup.data.settings?.length) await db.settings.bulkAdd(backup.data.settings);
     }
   );
