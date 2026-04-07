@@ -36,6 +36,14 @@ export class ZsebbankDB extends Dexie {
     this.version(2).stores({
       debts: 'id, direction, status, personName, date',
     });
+
+    this.version(3).stores({
+      piggyBanks: 'id, linkedAccountId, type',
+    }).upgrade(tx => {
+      return tx.table('piggyBanks').toCollection().modify(piggy => {
+        if (!piggy.type) piggy.type = 'bank';
+      });
+    });
   }
 }
 

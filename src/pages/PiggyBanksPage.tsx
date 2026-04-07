@@ -60,9 +60,14 @@ export function PiggyBanksPage() {
                           <ProgressBar current={piggy.currentAmount} target={piggy.targetAmount} color={piggy.color} />
                         </div>
                       )}
-                      {linkedAcc && (
-                        <p className="text-xs text-slate-400 mt-1">{linkedAcc.name}-hez kötve</p>
-                      )}
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-xs text-slate-400">
+                          {piggy.type === 'bank' ? Strings.account.bank : Strings.account.cashType}
+                        </span>
+                        {linkedAcc && (
+                          <span className="text-xs text-slate-400">· {linkedAcc.name}-hez kötve</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </Card>

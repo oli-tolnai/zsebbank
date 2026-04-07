@@ -107,7 +107,10 @@ export function PiggyDetailPage() {
               <ProgressBar current={piggy.currentAmount} target={piggy.targetAmount} color={piggy.color} height={10} />
             </>
           )}
-          {linkedAcc && <p className="text-xs text-slate-500">{linkedAcc.name}-hez kötve</p>}
+          <p className="text-xs text-slate-500">
+            {piggy.type === 'bank' ? Strings.account.bank : Strings.account.cashType}
+            {linkedAcc && ` · ${linkedAcc.name}-hez kötve`}
+          </p>
         </Card>
 
         <div className="grid grid-cols-2 gap-3">

@@ -62,6 +62,7 @@ export interface RecurringTransaction {
 export interface PiggyBank {
   id: string;
   name: string;
+  type: AccountType;
   targetAmount: number;
   currentAmount: number;
   linkedAccountId: string | null;
@@ -91,6 +92,7 @@ export interface Debt {
   status: DebtStatus;
   settledAccountId: string | null;
   settledAt: string | null;
+  transactionId: string | null;
   date: string;
   createdAt: string;
 }

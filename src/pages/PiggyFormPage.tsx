@@ -7,8 +7,10 @@ import { Card } from '@/components/ui/Card';
 import { Input } from '@/components/ui/Input';
 import { AmountInput } from '@/components/ui/AmountInput';
 import { Button } from '@/components/ui/Button';
+import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { DynamicIcon } from '@/components/common/DynamicIcon';
 import { Strings } from '@/constants/strings';
+import type { AccountType } from '@/types';
 import { AccountColors } from '@/constants/colors';
 import { showToast } from '@/components/ui/Toast';
 
@@ -22,6 +24,7 @@ export function PiggyFormPage() {
   const existing = id ? piggyBanks.find((p) => p.id === id) : null;
 
   const [name, setName] = useState(existing?.name ?? '');
+  const [type, setType] = useState<AccountType>(existing?.type ?? 'bank');
   const [targetAmount, setTargetAmount] = useState(existing?.targetAmount ?? 0);
   const [linkedAccountId, setLinkedAccountId] = useState(existing?.linkedAccountId ?? '');
   const [icon, setIcon] = useState(existing?.icon ?? 'PiggyBank');
@@ -37,10 +40,10 @@ export function PiggyFormPage() {
 
     try {
       if (isEdit) {
-        await updatePiggyBank(id!, { name: name.trim(), targetAmount, linkedAccountId: linkedAccountId || null, icon, color });
+        await updatePiggyBank(id!, { name: name.trim(), type, targetAmount, linkedAccountId: linkedAccountId || null, icon, color });
         showToast('success', 'Persely módosítva!');
       } else {
-        await addPiggyBank({ name: name.trim(), targetAmount, linkedAccountId: linkedAccountId || null, icon, color });
+        await addPiggyBank({ name: name.trim(), type, targetAmount, linkedAccountId: linkedAccountId || null, icon, color });
         showToast('success', 'Persely létrehozva!');
       }
       navigate(-1);
@@ -56,6 +59,19 @@ export function PiggyFormPage() {
         <Card>
           <div className="space-y-4">
             <Input label={Strings.piggy.name} value={name} onChange={(e) => { setName(e.target.value); setErrors({}); }} placeholder="pl. Nyaralás, Megtakarítás..." error={errors.name} />
+
+            <div>
+              <label className="block text-sm font-medium text-slate-600 mb-1">{Strings.account.type}</label>
+              <SegmentedControl
+                options={[
+                  { value: 'bank' as AccountType, label: Strings.account.bank },
+                  { value: 'cash' as AccountType, label: Strings.account.cashType },
+                ]}
+                value={type}
+                onChange={setType}
+              />
+            </div>
+
             <AmountInput label={`${Strings.piggy.target} (${Strings.common.optional})`} value={targetAmount} onChange={setTargetAmount} placeholder="0 = nincs célösszeg" />
 
             <div>
