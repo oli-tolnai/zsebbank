@@ -1,6 +1,9 @@
 import type { Label } from '@/types';
 import { generateId } from '@/utils/id';
 
+/** Pseudo label id for transactions that have no label at all. */
+export const UNLABELED_ID = '__none';
+
 export const defaultLabels: Omit<Label, 'id' | 'createdAt'>[] = [
   { name: 'Élelmiszer', type: 'expense', icon: 'ShoppingCart', color: '#22c55e', isDefault: true },
   { name: 'Közlekedés', type: 'expense', icon: 'Car', color: '#3b82f6', isDefault: true },

@@ -1,7 +1,7 @@
 export const Strings = {
   app: {
     name: 'Zsebbank',
-    version: '2.0.0',
+    version: '2.1.0',
   },
   tabs: {
     overview: 'Áttekintés',
@@ -65,6 +65,11 @@ export const Strings = {
     noTransactions: 'Még nincs tranzakció',
     filterAll: 'Mind',
     search: 'Keresés...',
+    filterLabels: 'Címkék',
+    noLabel: 'Címke nélkül',
+    allMonths: 'Összes hónap',
+    clearFilters: 'Szűrők törlése',
+    resultsCount: 'tranzakció',
   },
   recurring: {
     title: 'Ismétlődő',
@@ -108,6 +113,7 @@ export const Strings = {
     balance: 'Egyenleg',
     noData: 'Nincs elég adat',
     difference: 'Különbség',
+    tapLabelHint: 'Koppints egy címkére a részletekhez',
   },
   settings: {
     title: 'Beállítások',

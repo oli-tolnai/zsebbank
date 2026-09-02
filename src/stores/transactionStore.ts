@@ -7,6 +7,7 @@ import { useAccountStore } from './accountStore';
 interface TransactionFilters {
   type?: TransactionType;
   labelIds?: string[];
+  includeUnlabeled?: boolean;
   accountId?: string;
   startDate?: string;
   endDate?: string;
@@ -46,9 +47,7 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
   },
 
   loadFiltered: async (filters: TransactionFilters) => {
-    let collection = db.transactions.orderBy('date').reverse();
-
-    const all = await collection.toArray();
+    const all = await db.transactions.orderBy('date').reverse().toArray();
     let filtered = all;
 
     if (filters.type) {
@@ -63,8 +62,13 @@ export const useTransactionStore = create<TransactionState>((set, get) => ({
     if (filters.endDate) {
       filtered = filtered.filter((t) => t.date <= filters.endDate!);
     }
-    if (filters.labelIds && filters.labelIds.length > 0) {
-      filtered = filtered.filter((t) => filters.labelIds!.some((lid) => t.labelIds.includes(lid)));
+    const hasLabelFilter = (filters.labelIds && filters.labelIds.length > 0) || filters.includeUnlabeled;
+    if (hasLabelFilter) {
+      filtered = filtered.filter(
+        (t) =>
+          (filters.includeUnlabeled === true && t.labelIds.length === 0) ||
+          (filters.labelIds?.some((lid) => t.labelIds.includes(lid)) ?? false)
+      );
     }
     if (filters.search) {
       const s = filters.search.toLowerCase();

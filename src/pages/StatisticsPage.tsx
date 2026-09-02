@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Card } from '@/components/ui/Card';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
@@ -8,6 +9,7 @@ import { Strings } from '@/constants/strings';
 import { formatHuf, formatMonth, getCurrentMonth } from '@/utils/format';
 import { getMonthRange, getPreviousMonths } from '@/utils/date';
 import { db } from '@/db/database';
+import { UNLABELED_ID } from '@/constants/labels';
 import { useLabelStore } from '@/stores/labelStore';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import { ChevronLeft, ChevronRight, BarChart3 } from 'lucide-react';
@@ -16,6 +18,7 @@ import type { MonthlyStats, LabelStats } from '@/types';
 type Tab = 'monthly' | 'labels' | 'trend';
 
 export function StatisticsPage() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState<Tab>('monthly');
   const [currentMonth, setCurrentMonth] = useState(getCurrentMonth());
   const [monthStats, setMonthStats] = useState<MonthlyStats>({ month: '', income: 0, expense: 0 });
@@ -40,7 +43,7 @@ export function StatisticsPage() {
           labelMap.set(lid, (labelMap.get(lid) ?? 0) + tx.amount);
         }
         if (tx.labelIds.length === 0) {
-          labelMap.set('__none', (labelMap.get('__none') ?? 0) + tx.amount);
+          labelMap.set(UNLABELED_ID, (labelMap.get(UNLABELED_ID) ?? 0) + tx.amount);
         }
       }
 
@@ -49,7 +52,7 @@ export function StatisticsPage() {
           const label = getLabel(labelId);
           return {
             labelId,
-            labelName: label?.name ?? 'Egyéb',
+            labelName: label?.name ?? (labelId === UNLABELED_ID ? Strings.transaction.noLabel : 'Egyéb'),
             labelIcon: label?.icon ?? 'MoreHorizontal',
             labelColor: label?.color ?? '#94a3b8',
             total,
@@ -86,6 +89,10 @@ export function StatisticsPage() {
     const [y, m] = currentMonth.split('-').map(Number);
     const d = new Date(y, m);
     setCurrentMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+  };
+
+  const openLabelDetails = (labelId: string) => {
+    navigate(`/history?type=expense&month=${currentMonth}&labels=${labelId}`);
   };
 
   return (
@@ -159,16 +166,28 @@ export function StatisticsPage() {
                   <ResponsiveContainer>
                     <PieChart>
                       <Pie data={labelStats} dataKey="total" nameKey="labelName" cx="50%" cy="50%" innerRadius={50} outerRadius={80}>
-                        {labelStats.map((s) => <Cell key={s.labelId} fill={s.labelColor} />)}
+                        {labelStats.map((s) => (
+                          <Cell
+                            key={s.labelId}
+                            fill={s.labelColor}
+                            className="cursor-pointer outline-none"
+                            onClick={() => openLabelDetails(s.labelId)}
+                          />
+                        ))}
                       </Pie>
                       <Tooltip formatter={(v) => formatHuf(Number(v))} />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="space-y-2 mt-4">
+                <p className="text-xs text-slate-400 text-center mt-4">{Strings.statistics.tapLabelHint}</p>
+                <div className="space-y-1 mt-2">
                   {labelStats.map((s) => (
-                    <div key={s.labelId} className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: `${s.labelColor}20`, color: s.labelColor }}>
+                    <button
+                      key={s.labelId}
+                      onClick={() => openLabelDetails(s.labelId)}
+                      className="w-full flex items-center gap-3 -mx-1 px-1 py-1.5 rounded-xl hover:bg-slate-50 active:bg-slate-100 transition-colors text-left"
+                    >
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: `${s.labelColor}20`, color: s.labelColor }}>
                         <DynamicIcon name={s.labelIcon} size={16} />
                       </div>
                       <div className="flex-1 min-w-0">
@@ -176,7 +195,8 @@ export function StatisticsPage() {
                       </div>
                       <p className="text-sm font-semibold tabular-nums">{formatHuf(s.total)}</p>
                       <p className="text-xs text-slate-500 w-10 text-right">{s.percentage}%</p>
-                    </div>
+                      <ChevronRight size={16} className="text-slate-300 shrink-0" />
+                    </button>
                   ))}
                 </div>
               </>
